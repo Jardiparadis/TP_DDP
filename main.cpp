@@ -92,6 +92,29 @@ public:
 		xSize += 1;
 	}
 
+	void createNewLine(COORDINATE_DIRECTION direction)
+	{
+		std::deque<Point> line;
+
+		if (direction == COORDINATE_DIRECTION::POSITIVE)
+		{
+			for (int i = 0; i != xSize; ++i)
+			{
+				line.push_back(Point(i, ySize));
+			}
+			board.push_back(line);
+		}
+		else if (direction == COORDINATE_DIRECTION::NEGATIVE)
+		{
+			for (int i = 0; i != xSize; ++i)
+			{
+				line.push_back(Point(i, ySize - (ySize + 1)));
+			}
+			board.push_front(line);
+		}
+		ySize += 1;
+	}
+
 private:
 	int xSize;
 	int ySize;
@@ -105,12 +128,11 @@ private:
 		{
 			line.push_back(Point(i, y));
 		}
-			
 		board.push_back(line);
 	}
 
 	// extend x
-	
+
 
 	// extend y
 
@@ -126,6 +148,12 @@ int main()
 	map.createNewColumn(COORDINATE_DIRECTION::NEGATIVE);
 	map.createNewColumn(COORDINATE_DIRECTION::POSITIVE);
 	map.createNewColumn(COORDINATE_DIRECTION::NEGATIVE);
+	map.displayMap();
+	std::cout << "-----" << std::endl;
+	map.createNewLine(COORDINATE_DIRECTION::POSITIVE);
+	map.displayMap();
+	std::cout << "-----" << std::endl;
+	map.createNewLine(COORDINATE_DIRECTION::NEGATIVE);
 	map.displayMap();
 	return 0;
 }
