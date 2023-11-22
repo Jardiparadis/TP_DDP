@@ -4,6 +4,12 @@
 // 1 comprendre deque
 // 2 créer double deque
 
+enum class COORDINATE_DIRECTION
+{
+	POSITIVE,
+	NEGATIVE
+};
+
 class Point
 {
 public:
@@ -70,6 +76,30 @@ public:
 		}
 	}
 
+	void createNewLine(COORDINATE_DIRECTION direction)
+	{
+		std::deque<Point> line;
+
+		if (direction == COORDINATE_DIRECTION::POSITIVE)
+		{
+			for (int i = 0; i != xSize; ++i)
+			{
+				line.push_back(Point(i, ySize));
+			}
+			board.push_back(line);
+		}
+		else if (direction == COORDINATE_DIRECTION::NEGATIVE)
+		{
+			for (int i = 0; i != xSize; ++i)
+			{
+				line.push_back(Point(i, ySize - (ySize + 1)));
+			}
+			board.push_front(line);
+		}
+		ySize += 1;
+	}
+
+
 private:
 	int xSize;
 	int ySize;
@@ -91,6 +121,12 @@ private:
 int main()
 {
 	Map map(5, 5);
+	map.displayMap();
+	std::cout << "-----" << std::endl;
+	map.createNewLine(COORDINATE_DIRECTION::POSITIVE);
+	map.displayMap();
+	std::cout << "-----" << std::endl;
+	map.createNewLine(COORDINATE_DIRECTION::NEGATIVE);
 	map.displayMap();
 	return 0;
 }
