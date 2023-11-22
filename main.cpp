@@ -4,6 +4,24 @@
 // 1 comprendre deque
 // 2 créer double deque
 
+class Map
+{
+public:
+	Map()
+	{
+	}
+	~Map()
+	{
+	}
+	const std::deque<std::deque<int>> &getBoard() const
+	{
+		return board;
+	}
+
+private:
+	std::deque<std::deque<int>> board;
+};
+
 void displayMap(const std::deque<std::deque<int>> &deque)
 {
 	for (auto line : deque)
@@ -18,13 +36,6 @@ void displayMap(const std::deque<std::deque<int>> &deque)
 
 int main()
 {
-	std::deque<std::deque<int>> deque;
-	deque.push_back(std::deque<int>{ 1 });
-	deque.push_front(std::deque<int>{ 2 });
-	deque.push_back(std::deque<int>{ 3 });
-
-	deque.insert(deque.end(), std::deque<int>{ 4 });
-
-	displayMap(deque);
+	Map map();
 	return 1;
 }
