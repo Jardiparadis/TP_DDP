@@ -71,8 +71,6 @@ public:
 		}
 	}
 
-	// Create point
-
 	void createNewColumn(COORDINATE_DIRECTION direction)
 	{
 		if (direction == COORDINATE_DIRECTION::POSITIVE)
@@ -83,7 +81,7 @@ public:
 				board[i].push_back(Point(backXCoordinate + 1, i));
 			}
 		}
-		else
+		if (direction == COORDINATE_DIRECTION::NEGATIVE)
 		{
 			for (int i = 0; i != ySize; ++i)
 			{
