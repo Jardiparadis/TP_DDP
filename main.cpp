@@ -4,6 +4,12 @@
 // 1 comprendre deque
 // 2 créer double deque
 
+enum class COORDINATE_DIRECTION
+{
+	POSITIVE,
+	NEGATIVE
+};
+
 class Point
 {
 public:
@@ -52,11 +58,6 @@ public:
 	~Map()
 	{
 	}
-	
-	const std::deque<std::deque<Point>> &getBoard() const
-	{
-		return board;
-	}
 
 	void displayMap()
 	{
@@ -68,6 +69,29 @@ public:
 			}
 			std::cout << std::endl;
 		}
+	}
+
+	// Create point
+
+	void createNewColumn(COORDINATE_DIRECTION direction)
+	{
+		if (direction == COORDINATE_DIRECTION::POSITIVE)
+		{
+			for (int i = 0; i != ySize; ++i)
+			{
+				int backXCoordinate = board[i].back().getX();
+				board[i].push_back(Point(backXCoordinate + 1, i));
+			}
+		}
+		else
+		{
+			for (int i = 0; i != ySize; ++i)
+			{
+				int frontXCoordinate = board[i].front().getX();
+				board[i].push_front(Point(frontXCoordinate - 1, i));
+			}
+		}
+		xSize += 1;
 	}
 
 private:
@@ -86,11 +110,24 @@ private:
 			
 		board.push_back(line);
 	}
+
+	// extend x
+	
+
+	// extend y
+
+
 };
 
 int main()
 {
-	Map map(5, 5);
+	Map map(3, 2);
+	map.createNewColumn(COORDINATE_DIRECTION::POSITIVE);
+	map.createNewColumn(COORDINATE_DIRECTION::NEGATIVE);
+	map.createNewColumn(COORDINATE_DIRECTION::POSITIVE);
+	map.createNewColumn(COORDINATE_DIRECTION::NEGATIVE);
+	map.createNewColumn(COORDINATE_DIRECTION::POSITIVE);
+	map.createNewColumn(COORDINATE_DIRECTION::NEGATIVE);
 	map.displayMap();
 	return 0;
 }
