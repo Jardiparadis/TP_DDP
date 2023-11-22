@@ -78,7 +78,8 @@ public:
 			for (int i = 0; i != ySize; ++i)
 			{
 				int backXCoordinate = board[i].back().getX();
-				board[i].push_back(Point(backXCoordinate + 1, i));
+				int yCoordinate = board[i].back().getY();
+				board[i].push_back(Point(backXCoordinate + 1, yCoordinate));
 			}
 		}
 		if (direction == COORDINATE_DIRECTION::NEGATIVE)
@@ -86,7 +87,8 @@ public:
 			for (int i = 0; i != ySize; ++i)
 			{
 				int frontXCoordinate = board[i].front().getX();
-				board[i].push_front(Point(frontXCoordinate - 1, i));
+				int yCoordinate = board[i].front().getY();
+				board[i].push_front(Point(frontXCoordinate - 1, yCoordinate));
 			}
 		}
 		xSize += 1;
@@ -96,11 +98,15 @@ public:
 	{
 		std::deque<Point> line;
 
+		int xCoordinate = board[0].front().getX();
+		int backYCoordinate = board[0].back().getY();
+		int frontYCoordinate = board[0].front().getY();
+
 		if (direction == COORDINATE_DIRECTION::POSITIVE)
 		{
 			for (int i = 0; i != xSize; ++i)
 			{
-				line.push_back(Point(i, ySize));
+				line.push_back(Point(xCoordinate++, frontYCoordinate + 1));
 			}
 			board.push_back(line);
 		}
@@ -108,7 +114,7 @@ public:
 		{
 			for (int i = 0; i != xSize; ++i)
 			{
-				line.push_back(Point(i, ySize - (ySize + 1)));
+				line.push_back(Point(xCoordinate++, backYCoordinate - 1));
 			}
 			board.push_front(line);
 		}
@@ -155,5 +161,6 @@ int main()
 	std::cout << "-----" << std::endl;
 	map.createNewLine(COORDINATE_DIRECTION::NEGATIVE);
 	map.displayMap();
+
 	return 0;
 }
