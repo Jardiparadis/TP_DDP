@@ -31,7 +31,7 @@ void Map::displayMap()
 	{
 		for (auto& cell : line)
 		{
-			std::cout << "{" << cell.getY() << "," << cell.getX() << "},";
+			std::cout << "{" << cell.getY() << "," << cell.getX() << "," << (cell.getFieldType() == FIELD_TYPE::OBSTACLE ? "X" : "O") << "},";
 		}
 		std::cout << std::endl;
 	}
@@ -86,12 +86,29 @@ void Map::createNewLine(COORDINATE_DIRECTION direction)
 	}
 }
 
-void Map::createNewPoint(int x, int y)
+Point& Map::getPoint(int x, int y)
 {
-	// If point already exists, do nothing
+	for (int i = 0; i != board.size(); ++i)
+	{
+		if (board[i][0].getY() == y)
+		{
+			for (int j = 0; j != board[i].size(); ++j)
+			{
+				if (board[i][j].getX() == x)
+				{
+					return board[i][j];
+				}
+			}
+		}
+	}
+}
+
+void Map::createNewPoint(int x, int y, FIELD_TYPE fieldType)
+{
+	// If point already exists, only update type
 	if (y <= greatestY && y >= smallestY && x <= greatestX && x >= smallestX)
 	{
-		std::cout << "Point deja present" << std::endl;
+		getPoint(x, y).setFieldType(fieldType);
 		return;
 	}
 
@@ -129,4 +146,7 @@ void Map::createNewPoint(int x, int y)
 			createNewLine(COORDINATE_DIRECTION::POSITIVE);
 		}
 	}
+
+	// Set field type to the right cell
+	getPoint(x, y).setFieldType(fieldType);
 }

@@ -13,8 +13,10 @@ public:
 	~Point();
 	const int& getX() const;
 	const int& getY() const;
+	const FIELD_TYPE& getFieldType() const;
 	void setX(int _x);
 	void setY(int _y);
+	void setFieldType(FIELD_TYPE _fieldType);
 private:
 	int x;
 	int y;
