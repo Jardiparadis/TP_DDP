@@ -2,25 +2,25 @@
 #include "point.h"
 #include "noeud.h"
 
-float Noeud::getCoutPointDepartNoeudSuivant()
+float Noeud::getToDepart()
 {
-	return coutPointDepartNoeudSuivant;
+	return coutToDepart;
 }
-float Noeud::getCoutNoeudSuivantPointArrive()
+float Noeud::getToArrive()
 {
-	return coutNoeudSuivantPointArrive;
+	return coutToArrive;
 }
 float Noeud::getCoutSomme()
 {
 	return coutSomme;
 }
-void Noeud::setCoutPointDepartNoeudSuivant(float coutG)
+void Noeud::setToDepart(float coutG)
 {
-	coutPointDepartNoeudSuivant = coutG;
+	coutToDepart = coutG;
 }
-void Noeud::setCoutNoeudSuivantPointArrive(float coutH)
+void Noeud::setToArrive(float coutH)
 {
-	coutNoeudSuivantPointArrive = coutH;
+	coutToArrive = coutH;
 }
 void Noeud::setCoutSomme(float coutF)
 {

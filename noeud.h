@@ -10,16 +10,16 @@ public:
 		float coutF;
 	}
 	~Noeud() {}
-	float getCoutPointDepartNoeudSuivant();
-	float getCoutNoeudSuivantPointArrive();
+	float getToDepart();
+	float getToArrive();
 	float getCoutSomme();
-	void setCoutPointDepartNoeudSuivant(float coutG);
-	void setCoutNoeudSuivantPointArrive(float coutH);
+	void setToDepart(float coutG);
+	void setToArrive(float coutH);
 	void setCoutSomme(float coutF);
 
 private:
-	float coutPointDepartNoeudSuivant;
-	float coutNoeudSuivantPointArrive;
+	float coutToDepart;
+	float coutToArrive;
 	float coutSomme;
 
 	Point* parent;
