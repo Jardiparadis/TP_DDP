@@ -1,5 +1,6 @@
 #include <deque>
 #include <iostream>
+#include <cstdlib>
 
 // 1 comprendre deque
 // 2 créer double deque
@@ -99,14 +100,14 @@ public:
 		std::deque<Point> line;
 
 		int xCoordinate = board[0].front().getX();
-		int backYCoordinate = board[0].back().getY();
-		int frontYCoordinate = board[0].front().getY();
+		int backYCoordinate = board.back().back().getY();
+		int frontYCoordinate = board.front().front().getY();
 
 		if (direction == COORDINATE_DIRECTION::POSITIVE)
 		{
 			for (int i = 0; i != xSize; ++i)
 			{
-				line.push_back(Point(xCoordinate++, frontYCoordinate + 1));
+				line.push_back(Point(xCoordinate++, backYCoordinate + 1));
 			}
 			board.push_back(line);
 		}
@@ -114,11 +115,61 @@ public:
 		{
 			for (int i = 0; i != xSize; ++i)
 			{
-				line.push_back(Point(xCoordinate++, backYCoordinate - 1));
+				line.push_back(Point(xCoordinate++, frontYCoordinate - 1));
 			}
 			board.push_front(line);
 		}
 		ySize += 1;
+	}
+
+	void createNewPoint(int x, int y)
+	{
+		int backYCoordinate = board.back().back().getY();
+		int frontYCoordinate = board.front().front().getY();
+		// Map is always a rectangle so it does not matter which line we are using
+		int frontXCoordinate = board[0].front().getX();
+		int backXCoordinate = board[0].back().getX();
+
+		// If point already exists, do nothing
+		if (y <= backYCoordinate && y >= frontYCoordinate && x <= backXCoordinate && x >= frontXCoordinate)
+		{
+			std::cout << "Point deja present" << std::endl;
+			return;
+		}
+
+		// extend map on x negative coordinates
+		if (x < 0)
+		{			
+			for (int i = 0; i != abs(x - frontXCoordinate); ++i)
+			{
+				createNewColumn(COORDINATE_DIRECTION::NEGATIVE);
+			}
+		}
+		// extend map on x positive coordinates
+		else
+		{
+			for (int i = 0; i != x - backXCoordinate; ++i)
+			{
+				createNewColumn(COORDINATE_DIRECTION::POSITIVE);
+			}
+		}
+
+		// extend map on y negative coordinates
+		if (y < 0)
+		{
+			for (int i = 0; i != abs(y - frontYCoordinate); ++i)
+			{
+				createNewLine(COORDINATE_DIRECTION::NEGATIVE);
+			}
+		}
+		// extend map on y positive coordinates
+		else
+		{
+			for (int i = 0; i != y - backYCoordinate; ++i)
+			{
+				createNewLine(COORDINATE_DIRECTION::POSITIVE);
+			}
+		}
 	}
 
 private:
@@ -161,6 +212,45 @@ int main()
 	std::cout << "-----" << std::endl;
 	map.createNewLine(COORDINATE_DIRECTION::NEGATIVE);
 	map.displayMap();
+
+	std::cout << "-----" << std::endl;
+	map.createNewLine(COORDINATE_DIRECTION::NEGATIVE);
+	map.displayMap();
+
+	std::cout << "-----" << std::endl;
+	map.createNewLine(COORDINATE_DIRECTION::POSITIVE);
+	map.displayMap();
+
+
+	map.createNewPoint(-7, 9);
+	std::cout << "###-----###" << std::endl;
+	map.displayMap();
+
+	map.createNewPoint(-8, 10);
+	std::cout << "##########" << std::endl;
+	map.displayMap();
+
+	map.createNewPoint(6, 11);
+	std::cout << "##########" << std::endl;
+	map.displayMap();
+
+	map.createNewPoint(-9, -3);
+	std::cout << "##########" << std::endl;
+	map.displayMap();
+
+	map.createNewPoint(7, -4);
+	std::cout << "##########" << std::endl;
+	map.displayMap();
+
+	map.createNewPoint(7, -4);
+	std::cout << "##########" << std::endl;
+	//map.displayMap();
+
+	map.createNewPoint(3, 3);
+	std::cout << "##########" << std::endl;
+
+	map.createNewPoint(20, 20);
+	std::cout << "##########" << std::endl;
 
 	return 0;
 }
