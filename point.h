@@ -1,9 +1,15 @@
 #pragma once
 
+enum class FIELD_TYPE
+{
+	WATER,
+	OBSTACLE
+};
+
 class Point
 {
 public:
-	Point(int _x, int _y);
+	Point(int _x, int _y, FIELD_TYPE _type = FIELD_TYPE::WATER);
 	~Point();
 	const int& getX() const;
 	const int& getY() const;
@@ -12,4 +18,5 @@ public:
 private:
 	int x;
 	int y;
+	FIELD_TYPE fieldType;
 };
