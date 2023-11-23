@@ -3,6 +3,7 @@
 #include <deque>
 #include <iostream>
 #include <cstdlib>
+#include <vector>
 
 #include "point.h"
 
@@ -32,7 +33,7 @@ private:
 
 	void createNewColumn(COORDINATE_DIRECTION direction);
 	void createNewLine(COORDINATE_DIRECTION direction);
-	Point& getPoint(int x, int y);
+	std::shared_ptr<Point> getPoint(int x, int y);
 };
 
 class Node
@@ -41,6 +42,10 @@ public:
 	Node(std::shared_ptr<Point> _point)
 	{
 		_point = point;
+	}
+	std::shared_ptr<Point> getPoint()
+	{
+		return point;
 	}
 private:
 	std::shared_ptr<Point> point;

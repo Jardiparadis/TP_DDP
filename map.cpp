@@ -86,7 +86,7 @@ void Map::createNewLine(COORDINATE_DIRECTION direction)
 	}
 }
 
-Point& Map::getPoint(int x, int y)
+std::shared_ptr<Point> Map::getPoint(int x, int y)
 {
 	for (int i = 0; i != board.size(); ++i)
 	{
@@ -96,11 +96,12 @@ Point& Map::getPoint(int x, int y)
 			{
 				if (board[i][j].getX() == x)
 				{
-					return board[i][j];
+					return std::make_shared<Point>(board[i][j]);
 				}
 			}
 		}
 	}
+	return NULL;
 }
 
 void Map::createNewPoint(int x, int y, FIELD_TYPE fieldType)
@@ -108,7 +109,7 @@ void Map::createNewPoint(int x, int y, FIELD_TYPE fieldType)
 	// If point already exists, only update type
 	if (y <= greatestY && y >= smallestY && x <= greatestX && x >= smallestX)
 	{
-		getPoint(x, y).setFieldType(fieldType);
+		getPoint(x, y)->setFieldType(fieldType);
 		return;
 	}
 
@@ -147,12 +148,49 @@ void Map::createNewPoint(int x, int y, FIELD_TYPE fieldType)
 	}
 
 	// Set field type to the right cell
-	getPoint(x, y).setFieldType(fieldType);
+	getPoint(x, y)->setFieldType(fieldType);
 }
 
 void Map::getPathToPoint(int startingX, int startingY, int destinationX, int destinationY)
 {
-	Node startingPoint(std::make_shared<Point>(getPoint(0, 0)));
+	std::vector<std::shared_ptr<Node>> closedList;
+	std::vector<Node> openList;
+
+	std::shared_ptr<Node> currentNode(std::make_shared<Node>(getPoint(startingX, startingY)));
+	closedList.push_back(currentNode);
+
+	int closedListIndex = 0;
+
+	while (true)
+	{
+		std::vector<std::shared_ptr<Point>> adjacentePoints;
+		adjacentePoints.push_back(getPoint(closedList[closedListIndex]->getPoint()->getX() + 1, closedList[closedListIndex]->getPoint()->getY() - 1));
+		adjacentePoints.push_back(getPoint(closedList[closedListIndex]->getPoint()->getX()    , closedList[closedListIndex]->getPoint()->getY() + 1));
+		adjacentePoints.push_back(getPoint(closedList[closedListIndex]->getPoint()->getX() + 1, closedList[closedListIndex]->getPoint()->getY() + 1));
+		adjacentePoints.push_back(getPoint(closedList[closedListIndex]->getPoint()->getX() - 1, closedList[closedListIndex]->getPoint()->getY()    ));
+		adjacentePoints.push_back(getPoint(closedList[closedListIndex]->getPoint()->getX() + 1, closedList[closedListIndex]->getPoint()->getY()    ));
+		adjacentePoints.push_back(getPoint(closedList[closedListIndex]->getPoint()->getX() - 1, closedList[closedListIndex]->getPoint()->getY() - 1));
+		adjacentePoints.push_back(getPoint(closedList[closedListIndex]->getPoint()->getX()    , closedList[closedListIndex]->getPoint()->getY() - 1));
+		adjacentePoints.push_back(getPoint(closedList[closedListIndex]->getPoint()->getX() - 1, closedList[closedListIndex]->getPoint()->getY() + 1));
+
+		for (auto adjacentePoint : adjacentePoints)
+		{
+			// Si en bordure de map ou si c'est un obstacle
+			if (adjacentePoint == NULL || adjacentePoint->getFieldType() == FIELD_TYPE::OBSTACLE)
+			{
+				continue;
+			}
+
+			// Si il est dans la liste fermée
+			// if ()
+		
+			// Si il est dans la liste ouverte
+		}
+
+
+	}
+
+
 
 	std::cout << "Navigation!!" << std::endl;
 }
