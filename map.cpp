@@ -17,9 +17,9 @@ Map::~Map()
 
 void Map::displayMap()
 {
-	for (auto line : board)
+	for (auto& line : board)
 	{
-		for (auto cell : line)
+		for (auto& cell : line)
 		{
 			std::cout << "{" << cell.getY() << "," << cell.getX() << "},";
 		}

@@ -1,9 +1,10 @@
 #include "point.h"
 
-Point::Point(int _x, int _y)
+Point::Point(int _x, int _y, FIELD_TYPE _fieldType)
 {
 	x = _x;
 	y = _y;
+	fieldType = _fieldType;
 }
 
 Point::~Point()
