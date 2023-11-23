@@ -13,9 +13,9 @@ public:
 	float getToDepart();
 	float getToArrive();
 	float getCoutSomme();
-	void setToDepart(float coutG);
-	void setToArrive(float coutH);
-	void setCoutSomme(float coutF);
+	void setToDepart(Noeud n, int x1, int y1);
+	void setToArrive(int x1, int y1, int x2, int y2);
+	void setCoutSomme(float coutToDepart, float coutSomme);
 
 private:
 	float coutToDepart;

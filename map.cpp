@@ -2,12 +2,22 @@
 
 Map::Map(int _xSize, int _ySize)
 {
-	xSize = _xSize;
-	ySize = _ySize;
+	std::deque<Point> initialPoint;
+	initialPoint.push_back(Point(0, 0));
+	board.push_back(initialPoint);
 
-	for (int i = 0; i != ySize; ++i)
+	smallestX = 0;
+	greatestX = 0;
+	smallestY = 0;
+	greatestY = 0;
+
+	for (int i = 0; i != _ySize; ++i)
 	{
-		createLine(_xSize, i);
+		createNewLine(COORDINATE_DIRECTION::POSITIVE);
+	}
+	for (int i = 0; i != _xSize; ++i)
+	{
+		createNewColumn(COORDINATE_DIRECTION::POSITIVE);
 	}
 }
 
@@ -17,11 +27,11 @@ Map::~Map()
 
 void Map::displayMap()
 {
-	for (auto line : board)
+	for (auto& line : board)
 	{
-		for (auto cell : line)
+		for (auto& cell : line)
 		{
-			std::cout << "{" << cell.getY() << "," << cell.getX() << "},";
+			std::cout << "{" << cell.getY() << "," << cell.getX() << "," << (cell.getFieldType() == FIELD_TYPE::OBSTACLE ? "X" : "O") << "},";
 		}
 		std::cout << std::endl;
 	}
@@ -29,73 +39,83 @@ void Map::displayMap()
 
 void Map::createNewColumn(COORDINATE_DIRECTION direction)
 {
+	int yCoordinate = smallestY;
+	int totalYSize = greatestY + abs(smallestY);
 	if (direction == COORDINATE_DIRECTION::POSITIVE)
 	{
-		for (int i = 0; i != ySize; ++i)
+		greatestX += 1;
+		for (int i = 0; i != totalYSize + 1; ++i)
 		{
-			int backXCoordinate = board[i].back().getX();
-			int yCoordinate = board[i].back().getY();
-			board[i].push_back(Point(backXCoordinate + 1, yCoordinate));
+			board[i].push_back(Point(greatestX, yCoordinate++));
 		}
+		
 	}
 	if (direction == COORDINATE_DIRECTION::NEGATIVE)
 	{
-		for (int i = 0; i != ySize; ++i)
+		smallestX -= 1;
+		for (int i = 0; i != totalYSize + 1; ++i)
 		{
-			int frontXCoordinate = board[i].front().getX();
-			int yCoordinate = board[i].front().getY();
-			board[i].push_front(Point(frontXCoordinate - 1, yCoordinate));
+			board[i].push_front(Point(smallestX, yCoordinate++));
 		}
 	}
-	xSize += 1;
 }
 
 void Map::createNewLine(COORDINATE_DIRECTION direction)
 {
 	std::deque<Point> line;
-
-	int xCoordinate = board[0].front().getX();
-	int backYCoordinate = board.back().back().getY();
-	int frontYCoordinate = board.front().front().getY();
+	int xCoordinate = smallestX;
+	int totalXSize = greatestX + abs(smallestX);
 
 	if (direction == COORDINATE_DIRECTION::POSITIVE)
 	{
-		for (int i = 0; i != xSize; ++i)
+		greatestY += 1;
+		for (int i = 0; i != totalXSize + 1; ++i)
 		{
-			line.push_back(Point(xCoordinate++, backYCoordinate + 1));
+			line.push_back(Point(xCoordinate++, greatestY));
 		}
 		board.push_back(line);
 	}
 	else if (direction == COORDINATE_DIRECTION::NEGATIVE)
 	{
-		for (int i = 0; i != xSize; ++i)
+		smallestY -= 1;
+		for (int i = 0; i != totalXSize + 1; ++i)
 		{
-			line.push_back(Point(xCoordinate++, frontYCoordinate - 1));
+			line.push_back(Point(xCoordinate++, smallestY));
 		}
 		board.push_front(line);
 	}
-	ySize += 1;
 }
 
-void Map::createNewPoint(int x, int y)
+Point& Map::getPoint(int x, int y)
 {
-	int backYCoordinate = board.back().back().getY();
-	int frontYCoordinate = board.front().front().getY();
-	// Map is always a rectangle so it does not matter which line we are using
-	int frontXCoordinate = board[0].front().getX();
-	int backXCoordinate = board[0].back().getX();
-
-	// If point already exists, do nothing
-	if (y <= backYCoordinate && y >= frontYCoordinate && x <= backXCoordinate && x >= frontXCoordinate)
+	for (int i = 0; i != board.size(); ++i)
 	{
-		std::cout << "Point deja present" << std::endl;
+		if (board[i][0].getY() == y)
+		{
+			for (int j = 0; j != board[i].size(); ++j)
+			{
+				if (board[i][j].getX() == x)
+				{
+					return board[i][j];
+				}
+			}
+		}
+	}
+}
+
+void Map::createNewPoint(int x, int y, FIELD_TYPE fieldType)
+{
+	// If point already exists, only update type
+	if (y <= greatestY && y >= smallestY && x <= greatestX && x >= smallestX)
+	{
+		getPoint(x, y).setFieldType(fieldType);
 		return;
 	}
 
 	// extend map on x negative coordinates
 	if (x < 0)
 	{
-		for (int i = 0; i != abs(x - frontXCoordinate); ++i)
+		for (int i = abs(smallestX); i < abs(x); ++i)
 		{
 			createNewColumn(COORDINATE_DIRECTION::NEGATIVE);
 		}
@@ -103,8 +123,9 @@ void Map::createNewPoint(int x, int y)
 	// extend map on x positive coordinates
 	else
 	{
-		for (int i = 0; i != x - backXCoordinate; ++i)
+		for (int i = greatestX; i < x; ++i)
 		{
+			std::cout << "gen line" << std::endl;
 			createNewColumn(COORDINATE_DIRECTION::POSITIVE);
 		}
 	}
@@ -112,7 +133,7 @@ void Map::createNewPoint(int x, int y)
 	// extend map on y negative coordinates
 	if (y < 0)
 	{
-		for (int i = 0; i != abs(y - frontYCoordinate); ++i)
+		for (int i = abs(smallestY); i < abs(y); ++i)
 		{
 			createNewLine(COORDINATE_DIRECTION::NEGATIVE);
 		}
@@ -120,20 +141,12 @@ void Map::createNewPoint(int x, int y)
 	// extend map on y positive coordinates
 	else
 	{
-		for (int i = 0; i != y - backYCoordinate; ++i)
+		for (int i = greatestY; i < y; ++i)
 		{
 			createNewLine(COORDINATE_DIRECTION::POSITIVE);
 		}
 	}
-}
 
-void Map::createLine(int lineSize, int y)
-{
-	std::deque<Point> line;
-
-	for (int i = 0; i != lineSize; ++i)
-	{
-		line.push_back(Point(i, y));
-	}
-	board.push_back(line);
+	// Set field type to the right cell
+	getPoint(x, y).setFieldType(fieldType);
 }
