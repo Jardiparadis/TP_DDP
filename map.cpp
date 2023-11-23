@@ -31,7 +31,7 @@ void Map::displayMap()
 	{
 		for (auto& cell : line)
 		{
-			std::cout << "{" << cell.getY() << "," << cell.getX() << "," << (cell.getFieldType() == FIELD_TYPE::OBSTACLE ? "X" : "O") << "},";
+			std::cout << (cell.getFieldType() == FIELD_TYPE::OBSTACLE ? "X" : "O");
 		}
 		std::cout << std::endl;
 	}
@@ -125,7 +125,6 @@ void Map::createNewPoint(int x, int y, FIELD_TYPE fieldType)
 	{
 		for (int i = greatestX; i < x; ++i)
 		{
-			std::cout << "gen line" << std::endl;
 			createNewColumn(COORDINATE_DIRECTION::POSITIVE);
 		}
 	}
@@ -149,4 +148,11 @@ void Map::createNewPoint(int x, int y, FIELD_TYPE fieldType)
 
 	// Set field type to the right cell
 	getPoint(x, y).setFieldType(fieldType);
+}
+
+void Map::getPathToPoint(int startingX, int startingY, int destinationX, int destinationY)
+{
+	Node startingPoint(std::make_shared<Point>(getPoint(0, 0)));
+
+	std::cout << "Navigation!!" << std::endl;
 }
