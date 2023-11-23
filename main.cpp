@@ -6,12 +6,11 @@
 
 int main()
 {
-	Map map(0, 0);
-
-	map.createNewPoint(12, 12, FIELD_TYPE::OBSTACLE);
-	map.createNewPoint(-12, 12, FIELD_TYPE::OBSTACLE);
-	map.createNewPoint(12, -12, FIELD_TYPE::OBSTACLE);
-	map.createNewPoint(-12, -12, FIELD_TYPE::OBSTACLE);
+	Map map("map.txt");
+	//map.createNewPoint(12, 12, FIELD_TYPE::OBSTACLE);
+	//map.createNewPoint(-12, 12, FIELD_TYPE::OBSTACLE);
+	//map.createNewPoint(12, -12, FIELD_TYPE::OBSTACLE);
+	//map.createNewPoint(-12, -12, FIELD_TYPE::OBSTACLE);
 
 	std::cout << "##########" << std::endl;
 	map.displayMap();

@@ -21,6 +21,45 @@ Map::Map(int _xSize, int _ySize)
 	}
 }
 
+Map::Map(const std::string& path)
+{
+	std::deque<Point> initialPoint;
+	initialPoint.push_back(Point(0, 0));
+	board.push_back(initialPoint);
+
+	smallestX = 0;
+	greatestX = 0;
+	smallestY = 0;
+	greatestY = 0;
+
+	std::ifstream file;
+	file.open("map.txt");
+	std::string contentLine;
+
+	int y = 0;
+	if (file.is_open()) {
+		while (file.good()) {
+			int x = 0;
+			file >> contentLine;
+			std::cout << contentLine << std::endl;
+			for (auto& character : contentLine)
+			{
+				// 48 = "0" in ascii
+				if (character - 48 == FIELD_TYPE::OBSTACLE)
+				{
+					createNewPoint(x++, y, FIELD_TYPE::OBSTACLE);
+				}
+				else
+				{
+					createNewPoint(x++, y, FIELD_TYPE::WATER);
+				}
+			}
+			y += 1;
+		}
+	}
+	file.close();
+}
+
 Map::~Map()
 {
 }
@@ -125,7 +164,6 @@ void Map::createNewPoint(int x, int y, FIELD_TYPE fieldType)
 	{
 		for (int i = greatestX; i < x; ++i)
 		{
-			std::cout << "gen line" << std::endl;
 			createNewColumn(COORDINATE_DIRECTION::POSITIVE);
 		}
 	}

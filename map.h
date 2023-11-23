@@ -3,6 +3,7 @@
 #include <deque>
 #include <iostream>
 #include <cstdlib>
+#include <fstream>
 
 #include "point.h"
 
@@ -16,6 +17,7 @@ class Map
 {
 public:
 	Map(int _xSize, int _ySize);
+	Map(const std::string& path);
 	~Map();
 
 	void displayMap();

@@ -1,8 +1,8 @@
 #pragma once
 
-enum class FIELD_TYPE
+enum FIELD_TYPE
 {
-	WATER,
+	WATER = 0,
 	OBSTACLE
 };
 
