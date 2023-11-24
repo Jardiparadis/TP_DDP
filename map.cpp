@@ -180,18 +180,75 @@ int Map::getDistanceBetweenTwoPoint(int x1, int y1, int x2, int y2)
 	return pow(x1 - x2, 2) + pow(y1 - y2, 2);
 }
 
-void Map::drawSolution(std::shared_ptr<Node> finalNode)
+bool Map::isInPath(std::shared_ptr<Node> finalNode, const Point &cell) const
 {
 	while (finalNode != NULL)
 	{
-		createNewPoint(finalNode->getPoint()->getX(), finalNode->getPoint()->getY(), FIELD_TYPE::PATH);
+		if (finalNode->getPoint()->getX() == cell.getX() && finalNode->getPoint()->getY() == cell.getY())
+		{
+			return true;
+		}
 		finalNode = finalNode->getParent();
+	}
+	return false;
+}
+
+std::shared_ptr<Node> Map::getFirstNode(std::shared_ptr<Node> finalNode) const
+{
+	while (finalNode != NULL)
+	{
+		if (finalNode->getParent() == NULL)
+		{
+			return finalNode;
+		}
+		finalNode = finalNode->getParent();
+	}
+	return NULL;
+}
+
+void Map::drawSolution(std::shared_ptr<Node> finalNode)
+{	
+	std::shared_ptr<Node> firstNode = getFirstNode(finalNode);
+	for (const auto& line : board)
+	{
+		for (const auto& cell : line)
+		{
+			// If it is the first node, display it as the end of the path (node path is reversed)
+			if (finalNode->getPoint()->getX() == cell.getX() && finalNode->getPoint()->getY() == cell.getY())
+			{
+				std::cout << "E";
+				continue;
+			}
+
+			// If it is the last node, display it as the start of the path (node path is reversed)
+			if (firstNode->getPoint()->getX() == cell.getX() && firstNode->getPoint()->getY() == cell.getY())
+			{
+				std::cout << "S";
+				continue;
+			}
+
+			if (isInPath(finalNode, cell))
+			{
+				std::cout << "#";
+				continue;
+			}
+
+			if (cell.getFieldType() == FIELD_TYPE::OBSTACLE)
+			{
+				std::cout << "X";
+			}
+			else if (cell.getFieldType() == FIELD_TYPE::WATER)
+			{
+				std::cout << ".";
+			}
+		}
+		std::cout << std::endl;
 	}
 }
 
 void Map::searchForPath(int startingX, int startingY, int destinationX, int destinationY)
 {
-	// We choose unordered map for fast access to elements and easy delete anywhere in the list
+	// We choose unordered map for fast access to elements, easy insert / delete anywhere in the list, as theya re not contiguous in memory
 	// Open list store node to inspect
 	std::unordered_map<std::string, std::shared_ptr<Node>> openList;
 	// Close list store explored nodes
@@ -250,7 +307,8 @@ void Map::searchForPath(int startingX, int startingY, int destinationX, int dest
 
 			// Create a new node and insert it in the open list
 			std::shared_ptr<Node> node(new Node(adjacentNode.getPoint()));
-			node->setDistanceWithStart(currentNode->getDistanceWithStart() + getDistanceBetweenTwoPoint(adjacentNode.getPoint()->getX(), adjacentNode.getPoint()->getY(), currentNode->getPoint()->getX(), currentNode->getPoint()->getY()));
+			int distanceBetweenAdjacenteNodeAndCurrentNode = getDistanceBetweenTwoPoint(adjacentNode.getPoint()->getX(), adjacentNode.getPoint()->getY(), currentNode->getPoint()->getX(), currentNode->getPoint()->getY());
+			node->setDistanceWithStart(currentNode->getDistanceWithStart() + distanceBetweenAdjacenteNodeAndCurrentNode);
 			node->setFCost(node->getDistanceWithStart() + getDistanceBetweenTwoPoint(adjacentNode.getPoint()->getX(), adjacentNode.getPoint()->getY(), destinationX, destinationY));
 			node->setParent(currentNode);
 			openList.insert({ std::to_string(node->getPoint()->getX()) + ';' + std::to_string(node->getPoint()->getY()) , node });

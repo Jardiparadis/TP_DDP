@@ -22,6 +22,8 @@ int main()
 
 	map.searchForPath(1, 1, 7, 7);
 
+	std::cout << "##########" << std::endl;
+
 	map.displayMap();
 
 	return 0;
