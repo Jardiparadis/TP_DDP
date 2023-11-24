@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <unordered_map>
 #include <string>
+#include <forward_list>
 
 #include "point.h"
 #include "node.h"

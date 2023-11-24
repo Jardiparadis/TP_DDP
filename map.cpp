@@ -268,22 +268,29 @@ void Map::searchForPath(int startingX, int startingY, int destinationX, int dest
 	std::unordered_map<std::string, std::shared_ptr<Node>> closeList;
 	// Key in these map are formated like : "x-coordinate;y-coordinate"
 
+	std::forward_list<std::pair<double, std::shared_ptr<Node>>> costsList;
+
+
 	//Add start node to openList
 	std::shared_ptr<Node> startNode(new Node(getPoint(startingX, startingY)));
 	openList.insert({ std::to_string(startNode->getPoint()->getX()) + ';' + std::to_string(startNode->getPoint()->getY()) , startNode });
+	costsList.push_front(std::make_pair(startNode->getFCost(), startNode));
 
 	while (openList.size() > 0)
 	{
 		// Move lowest cost from open to close list
-		std::shared_ptr<Node> currentNode = getLowestFCostIndex(openList);
+		std::shared_ptr<Node> currentNode = costsList.begin()->second;
 		std::string currentNodeKey = std::to_string(currentNode->getPoint()->getX()) + ';' + std::to_string(currentNode->getPoint()->getY());
 		closeList.insert({ currentNodeKey, currentNode });
 		openList.erase(currentNodeKey);
+		costsList.pop_front();
 
 		// Win condition
 		if (currentNode->getPoint()->getX() == destinationX && currentNode->getPoint()->getY() == destinationY)
 		{
-			return drawSolution(currentNode);
+			std::cout << "WIN WIN\n" << std::endl;
+			return;
+			//return drawSolution(currentNode);
 		}
 
 		// Get all the 8 adjacentes nodes
@@ -341,9 +348,42 @@ void Map::searchForPath(int startingX, int startingY, int destinationX, int dest
 			std::shared_ptr<Node> node(new Node(adjacentNode.getPoint()));
 			double distanceBetweenAdjacenteNodeAndCurrentNode = getDistanceBetweenTwoPoint(adjacentNode.getPoint()->getX(), adjacentNode.getPoint()->getY(), currentNode->getPoint()->getX(), currentNode->getPoint()->getY());
 			node->setDistanceWithStart(currentNode->getDistanceWithStart() + distanceBetweenAdjacenteNodeAndCurrentNode);
-			node->setFCost(node->getDistanceWithStart() + getDistanceBetweenTwoPoint(adjacentNode.getPoint()->getX(), adjacentNode.getPoint()->getY(), destinationX, destinationY));
+
+			int fieldModifier = 1;
+			if (adjacentNode.getPoint()->getFieldType() == FIELD_TYPE::TEMPEST)
+			{
+				fieldModifier = 1.5;
+			}
+			if (adjacentNode.getPoint()->getFieldType() == FIELD_TYPE::REEF)
+			{
+				fieldModifier = 2;
+			}
+
+			node->setFCost((node->getDistanceWithStart() + getDistanceBetweenTwoPoint(adjacentNode.getPoint()->getX(), adjacentNode.getPoint()->getY(), destinationX, destinationY)) * fieldModifier);
 			node->setParent(currentNode);
 			openList.insert({ std::to_string(node->getPoint()->getX()) + ';' + std::to_string(node->getPoint()->getY()) , node });
+
+			if (costsList.begin() == costsList.end())
+			{
+				costsList.push_front(std::make_pair(node->getFCost(), node));
+				continue;
+			}
+
+			auto indexToInsert = costsList.begin();
+			for (auto it = costsList.begin(); it != costsList.end(); it++) {
+				if (node->getFCost() < it->first)
+				{
+					costsList.insert_after(indexToInsert, std::make_pair(node->getFCost(), node));
+					break;
+				}
+				indexToInsert++;
+			}
+
+			/*
+			for (auto& a : costsList)
+				std::cout << a.first << " ";
+			std::cout << std::endl;
+			*/
 		}
 	}
 }
