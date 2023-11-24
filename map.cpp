@@ -31,7 +31,18 @@ void Map::displayMap()
 	{
 		for (auto& cell : line)
 		{
-			std::cout << (cell.getFieldType() == FIELD_TYPE::OBSTACLE ? "X" : "O");
+			if (cell.getFieldType() == FIELD_TYPE::OBSTACLE)
+			{
+				std::cout << "X";
+			}
+			else if (cell.getFieldType() == FIELD_TYPE::PATH)
+			{
+				std::cout << "#";
+			}
+			else if (cell.getFieldType() == FIELD_TYPE::WATER)
+			{
+				std::cout << ".";
+			}
 		}
 		std::cout << std::endl;
 	}
@@ -169,6 +180,15 @@ int Map::getDistanceBetweenTwoPoint(int x1, int y1, int x2, int y2)
 	return pow(x1 - x2, 2) + pow(y1 - y2, 2);
 }
 
+void Map::drawSolution(std::shared_ptr<Node> finalNode)
+{
+	while (finalNode != NULL)
+	{
+		createNewPoint(finalNode->getPoint()->getX(), finalNode->getPoint()->getY(), FIELD_TYPE::PATH);
+		finalNode = finalNode->getParent();
+	}
+}
+
 void Map::searchForPath(int startingX, int startingY, int destinationX, int destinationY)
 {
 	// We choose unordered map for fast access to elements and easy delete anywhere in the list
@@ -193,15 +213,8 @@ void Map::searchForPath(int startingX, int startingY, int destinationX, int dest
 		// Win condition
 		if (currentNode->getPoint()->getX() == destinationX && currentNode->getPoint()->getY() == destinationY)
 		{
-			std::cout << "Chemin trouvé !" << std::endl;
-			while (currentNode != NULL)
-			{
-				std::cout << currentNode->getPoint()->getX() << ";" << currentNode->getPoint()->getY() << std::endl;
-				currentNode = currentNode->getParent();
-			}
-			break;
+			return drawSolution(currentNode);
 		}
-
 
 		// Get all the 8 adjacentes nodes
 		std::vector<Node> adjacentNodes = {
@@ -225,7 +238,12 @@ void Map::searchForPath(int startingX, int startingY, int destinationX, int dest
 			}
 			std::string nodeKey = std::to_string(adjacentNode.getPoint()->getX()) + ';' + std::to_string(adjacentNode.getPoint()->getY());
 			// If is is an obstacle or if node exists in the close or open list
-			if (adjacentNode.getPoint()->getFieldType() == FIELD_TYPE::OBSTACLE || closeList.find(nodeKey) != closeList.end() || openList.find(nodeKey) != openList.end())
+			const auto &nodeInOpenList = openList.find(nodeKey);
+			if (
+				adjacentNode.getPoint()->getFieldType() == FIELD_TYPE::OBSTACLE || // If it is an obstacle
+				closeList.find(nodeKey) != closeList.end() || // If it exists in the close list
+				(nodeInOpenList != openList.end() && nodeInOpenList->second->getFCost() < adjacentNode.getFCost()) //If it exists in the open list with a smaller fCost value
+			)
 			{
 				continue;
 			}
