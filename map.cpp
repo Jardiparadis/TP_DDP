@@ -275,26 +275,45 @@ void Map::searchForPath(int startingX, int startingY, int destinationX, int dest
 
 		// Get all the 8 adjacentes nodes
 		std::vector<Node> adjacentNodes = {
-			Node(getPoint(currentNode->getPoint()->getX() + 1, currentNode->getPoint()->getY())),
 			Node(getPoint(currentNode->getPoint()->getX()    , currentNode->getPoint()->getY() + 1)),
-			Node(getPoint(currentNode->getPoint()->getX() - 1, currentNode->getPoint()->getY())),
-			Node(getPoint(currentNode->getPoint()->getX()    , currentNode->getPoint()->getY() - 1)),
 			Node(getPoint(currentNode->getPoint()->getX() + 1, currentNode->getPoint()->getY() + 1)),
-			Node(getPoint(currentNode->getPoint()->getX() - 1, currentNode->getPoint()->getY() - 1)),
+			Node(getPoint(currentNode->getPoint()->getX() + 1, currentNode->getPoint()->getY()    )),
 			Node(getPoint(currentNode->getPoint()->getX() + 1, currentNode->getPoint()->getY() - 1)),
+			Node(getPoint(currentNode->getPoint()->getX()	 , currentNode->getPoint()->getY() - 1)),
+			Node(getPoint(currentNode->getPoint()->getX() - 1, currentNode->getPoint()->getY() - 1)),
+			Node(getPoint(currentNode->getPoint()->getX() - 1, currentNode->getPoint()->getY()    )),
 			Node(getPoint(currentNode->getPoint()->getX() - 1, currentNode->getPoint()->getY() + 1))
 		};
 
+		int i = -1;
 		// explore adjacentes nodes
 		for (const auto& adjacentNode : adjacentNodes)
 		{
+			i += 1;
 			// Node does not exists on the map
 			if (adjacentNode.getPoint() == NULL)
 			{
 				continue;
 			}
+
+			/*
+			* AdjacenteNodes vector is filled by nodes as follow: top, top right,right, bottom right, bottom, bottom left, left, top left 
+			* With vector index, each odd index represents a diagonal.
+			* For each diagonal, we check if the nodes with index-1 and index+1 are obstacle, and if it is the case we do not consider the node, as we can't follow the diagonal of an obstacle
+			*/
+			// If it is a diagonal
+			if (i % 2 != 0)
+			{
+				// Loop the vector: in the map, the last element is next to the first
+				int nextNode = (i + 1) % 8;
+				int previousNode = i - 1;
+				if (adjacentNodes[nextNode].getPoint()->getFieldType() == FIELD_TYPE::OBSTACLE || adjacentNodes[previousNode].getPoint()->getFieldType() == FIELD_TYPE::OBSTACLE)
+				{
+					continue;
+				}
+			}
+
 			std::string nodeKey = std::to_string(adjacentNode.getPoint()->getX()) + ';' + std::to_string(adjacentNode.getPoint()->getY());
-			// If is is an obstacle or if node exists in the close or open list
 			const auto &nodeInOpenList = openList.find(nodeKey);
 			if (
 				adjacentNode.getPoint()->getFieldType() == FIELD_TYPE::OBSTACLE || // If it is an obstacle

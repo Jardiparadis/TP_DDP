@@ -20,7 +20,7 @@ int main()
 
 	std::cout << "##########" << std::endl;
 
-	map.searchForPath(1, 1, 7, 7);
+	map.searchForPath(0, 6, 7, 7);
 
 	std::cout << "##########" << std::endl;
 
