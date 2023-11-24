@@ -3,8 +3,11 @@
 #include <deque>
 #include <iostream>
 #include <cstdlib>
+#include <unordered_map>
+#include <string>
 
 #include "point.h"
+#include "node.h"
 
 enum class COORDINATE_DIRECTION
 {
@@ -20,6 +23,7 @@ public:
 
 	void displayMap();
 	void createNewPoint(int x, int y, FIELD_TYPE fieldType);
+	void searchForPath(int startingX, int startingY, int destinationX, int destinationY);
 private:
 	int xSize;
 	int ySize;
@@ -31,5 +35,7 @@ private:
 
 	void createNewColumn(COORDINATE_DIRECTION direction);
 	void createNewLine(COORDINATE_DIRECTION direction);
-	Point& getPoint(int x, int y);
+	Point* getPoint(int x, int y);
+	int getDistanceBetweenTwoPoint(int x1, int y1, int x2, int y2);
+	std::shared_ptr<Node> getLowestFCostIndex(const std::unordered_map<std::string, std::shared_ptr<Node>>& list);
 };
