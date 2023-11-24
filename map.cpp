@@ -184,7 +184,7 @@ double Map::getDistanceBetweenTwoPoint(int x1, int y1, int x2, int y2)
 	return sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2));
 }
 
-bool Map::isInPath(std::shared_ptr<Node> finalNode, const Point &cell) const
+bool Map::isInPath(Node *finalNode, const Point &cell) const
 {
 	while (finalNode != NULL)
 	{
@@ -197,7 +197,7 @@ bool Map::isInPath(std::shared_ptr<Node> finalNode, const Point &cell) const
 	return false;
 }
 
-std::shared_ptr<Node> Map::getFirstNode(std::shared_ptr<Node> finalNode) const
+Node *Map::getFirstNode(Node *finalNode) const
 {
 	while (finalNode != NULL)
 	{
@@ -212,7 +212,7 @@ std::shared_ptr<Node> Map::getFirstNode(std::shared_ptr<Node> finalNode) const
 
 void Map::drawSolution(std::shared_ptr<Node> finalNode)
 {	
-	std::shared_ptr<Node> firstNode = getFirstNode(finalNode);
+	Node *firstNode = getFirstNode(finalNode.get());
 	for (const auto& line : board)
 	{
 		for (const auto& cell : line)
@@ -231,7 +231,7 @@ void Map::drawSolution(std::shared_ptr<Node> finalNode)
 				continue;
 			}
 
-			if (isInPath(finalNode, cell))
+			if (isInPath(finalNode.get(), cell))
 			{
 				std::cout << "#";
 				continue;
@@ -268,8 +268,8 @@ void Map::searchForPath(int startingX, int startingY, int destinationX, int dest
 	std::unordered_map<std::string, std::shared_ptr<Node>> closeList;
 	// Key in these map are formated like : "x-coordinate;y-coordinate"
 
+	// Store cost for each point. Take more memory but faster to get that iterationg on the map
 	std::forward_list<std::pair<double, std::shared_ptr<Node>>> costsList;
-
 
 	//Add start node to openList
 	std::shared_ptr<Node> startNode(new Node(getPoint(startingX, startingY)));
@@ -288,9 +288,7 @@ void Map::searchForPath(int startingX, int startingY, int destinationX, int dest
 		// Win condition
 		if (currentNode->getPoint()->getX() == destinationX && currentNode->getPoint()->getY() == destinationY)
 		{
-			std::cout << "WIN WIN\n" << std::endl;
-			return;
-			//return drawSolution(currentNode);
+			return drawSolution(currentNode);
 		}
 
 		// Get all the 8 adjacentes nodes
@@ -360,7 +358,8 @@ void Map::searchForPath(int startingX, int startingY, int destinationX, int dest
 			}
 
 			node->setFCost((node->getDistanceWithStart() + getDistanceBetweenTwoPoint(adjacentNode.getPoint()->getX(), adjacentNode.getPoint()->getY(), destinationX, destinationY)) * fieldModifier);
-			node->setParent(currentNode);
+			// Shared_ptr are stored until the end, so there is no risk to lose the pointer
+			node->setParent(currentNode.get());
 			openList.insert({ std::to_string(node->getPoint()->getX()) + ';' + std::to_string(node->getPoint()->getY()) , node });
 
 			if (costsList.begin() == costsList.end())
@@ -378,12 +377,6 @@ void Map::searchForPath(int startingX, int startingY, int destinationX, int dest
 				}
 				indexToInsert++;
 			}
-
-			/*
-			for (auto& a : costsList)
-				std::cout << a.first << " ";
-			std::cout << std::endl;
-			*/
 		}
 	}
 }

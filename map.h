@@ -40,6 +40,6 @@ private:
 	double getDistanceBetweenTwoPoint(int x1, int y1, int x2, int y2);
 	std::shared_ptr<Node> getLowestFCostIndex(const std::unordered_map<std::string, std::shared_ptr<Node>>& list);
 	void drawSolution(std::shared_ptr<Node> finalNode);
-	bool isInPath(std::shared_ptr<Node> finalNode, const Point& cell) const;
-	std::shared_ptr<Node> getFirstNode(std::shared_ptr<Node> finalNode) const;
+	bool isInPath(Node *finalNode, const Point& cell) const;
+	Node *getFirstNode(Node *finalNode) const;
 };

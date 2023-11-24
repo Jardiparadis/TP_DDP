@@ -9,7 +9,7 @@ int main()
 {
 	Map map(0, 0);
 
-	map.createNewPoint(1000, 1000, FIELD_TYPE::WATER);
+	map.createNewPoint(200, 200, FIELD_TYPE::WATER);
 	map.createNewPoint(5, 4, FIELD_TYPE::TEMPEST);
 	map.createNewPoint(6, 6, FIELD_TYPE::REEF);
 	map.createNewPoint(7, 5, FIELD_TYPE::REEF);
@@ -24,7 +24,7 @@ int main()
 
 	auto t1 = std::chrono::high_resolution_clock::now();
 
-	map.searchForPath(0, 6, 875, 775);
+	map.searchForPath(0, 6, 7, 7);
 
 	std::cout << "OH NO!" << std::endl;
 

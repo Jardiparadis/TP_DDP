@@ -1,6 +1,6 @@
 #include "node.h"
 
-std::shared_ptr<Node> Node::getParent() const
+Node *Node::getParent() const
 {
 	return parent;
 }
@@ -20,7 +20,7 @@ double Node::getDistanceWithStart() const
 	return distanceWithStart;
 }
 
-void Node::setParent(std::shared_ptr<Node> _parent)
+void Node::setParent(Node *_parent)
 {
 	parent = _parent;
 }
