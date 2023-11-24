@@ -4,9 +4,8 @@ enum class FIELD_TYPE
 {
 	WATER,
 	OBSTACLE,
-	PATH,
-	START_POINT,
-	END_POINT
+	TEMPEST,
+	REEF
 };
 
 class Point

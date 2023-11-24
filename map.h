@@ -36,7 +36,7 @@ private:
 	void createNewColumn(COORDINATE_DIRECTION direction);
 	void createNewLine(COORDINATE_DIRECTION direction);
 	Point* getPoint(int x, int y);
-	int getDistanceBetweenTwoPoint(int x1, int y1, int x2, int y2);
+	double getDistanceBetweenTwoPoint(int x1, int y1, int x2, int y2);
 	std::shared_ptr<Node> getLowestFCostIndex(const std::unordered_map<std::string, std::shared_ptr<Node>>& list);
 	void drawSolution(std::shared_ptr<Node> finalNode);
 	bool isInPath(std::shared_ptr<Node> finalNode, const Point& cell) const;

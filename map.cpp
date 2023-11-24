@@ -27,21 +27,25 @@ Map::~Map()
 
 void Map::displayMap()
 {
-	for (auto& line : board)
+	for (const auto& line : board)
 	{
-		for (auto& cell : line)
+		for (const auto& cell : line)
 		{
 			if (cell.getFieldType() == FIELD_TYPE::OBSTACLE)
 			{
 				std::cout << "X";
 			}
-			else if (cell.getFieldType() == FIELD_TYPE::PATH)
-			{
-				std::cout << "#";
-			}
 			else if (cell.getFieldType() == FIELD_TYPE::WATER)
 			{
 				std::cout << ".";
+			}
+			else if (cell.getFieldType() == FIELD_TYPE::REEF)
+			{
+				std::cout << ",";
+			}
+			else if (cell.getFieldType() == FIELD_TYPE::TEMPEST)
+			{
+				std::cout << ";";
 			}
 		}
 		std::cout << std::endl;
@@ -175,9 +179,9 @@ std::shared_ptr<Node> Map::getLowestFCostIndex(const std::unordered_map<std::str
 	return smallestCost;
 }
 
-int Map::getDistanceBetweenTwoPoint(int x1, int y1, int x2, int y2)
+double Map::getDistanceBetweenTwoPoint(int x1, int y1, int x2, int y2)
 {
-	return pow(x1 - x2, 2) + pow(y1 - y2, 2);
+	return sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2));
 }
 
 bool Map::isInPath(std::shared_ptr<Node> finalNode, const Point &cell) const
@@ -241,6 +245,14 @@ void Map::drawSolution(std::shared_ptr<Node> finalNode)
 			{
 				std::cout << ".";
 			}
+			else if (cell.getFieldType() == FIELD_TYPE::REEF)
+			{
+				std::cout << ",";
+			}
+			else if (cell.getFieldType() == FIELD_TYPE::TEMPEST)
+			{
+				std::cout << ";";
+			}
 		}
 		std::cout << std::endl;
 	}
@@ -298,7 +310,7 @@ void Map::searchForPath(int startingX, int startingY, int destinationX, int dest
 			}
 
 			/*
-			* AdjacenteNodes vector is filled by nodes as follow: top, top right,right, bottom right, bottom, bottom left, left, top left 
+			* adjacenteNodes vector is filled by nodes as follow: top, top right,right, bottom right, bottom, bottom left, left, top left 
 			* With vector index, each odd index represents a diagonal.
 			* For each diagonal, we check if the nodes with index-1 and index+1 are obstacle, and if it is the case we do not consider the node, as we can't follow the diagonal of an obstacle
 			*/
@@ -306,9 +318,9 @@ void Map::searchForPath(int startingX, int startingY, int destinationX, int dest
 			if (i % 2 != 0)
 			{
 				// Loop the vector: in the map, the last element is next to the first
-				int nextNode = (i + 1) % 8;
-				int previousNode = i - 1;
-				if (adjacentNodes[nextNode].getPoint()->getFieldType() == FIELD_TYPE::OBSTACLE || adjacentNodes[previousNode].getPoint()->getFieldType() == FIELD_TYPE::OBSTACLE)
+				int nextNodeIndex = (i + 1) % 8;
+				int previousNodeIndex = i - 1;
+				if (adjacentNodes[nextNodeIndex].getPoint()->getFieldType() == FIELD_TYPE::OBSTACLE || adjacentNodes[previousNodeIndex].getPoint()->getFieldType() == FIELD_TYPE::OBSTACLE)
 				{
 					continue;
 				}
@@ -327,7 +339,7 @@ void Map::searchForPath(int startingX, int startingY, int destinationX, int dest
 
 			// Create a new node and insert it in the open list
 			std::shared_ptr<Node> node(new Node(adjacentNode.getPoint()));
-			int distanceBetweenAdjacenteNodeAndCurrentNode = getDistanceBetweenTwoPoint(adjacentNode.getPoint()->getX(), adjacentNode.getPoint()->getY(), currentNode->getPoint()->getX(), currentNode->getPoint()->getY());
+			double distanceBetweenAdjacenteNodeAndCurrentNode = getDistanceBetweenTwoPoint(adjacentNode.getPoint()->getX(), adjacentNode.getPoint()->getY(), currentNode->getPoint()->getX(), currentNode->getPoint()->getY());
 			node->setDistanceWithStart(currentNode->getDistanceWithStart() + distanceBetweenAdjacenteNodeAndCurrentNode);
 			node->setFCost(node->getDistanceWithStart() + getDistanceBetweenTwoPoint(adjacentNode.getPoint()->getX(), adjacentNode.getPoint()->getY(), destinationX, destinationY));
 			node->setParent(currentNode);

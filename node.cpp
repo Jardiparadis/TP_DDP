@@ -10,12 +10,12 @@ Point* Node::getPoint() const
 	return point;
 }
 
-int Node::getFCost() const
+double Node::getFCost() const
 {
 	return fCost;
 }
 
-int Node::getDistanceWithStart() const
+double Node::getDistanceWithStart() const
 {
 	return distanceWithStart;
 }
@@ -30,12 +30,12 @@ void Node::setPoint(Point* _point)
 	point = _point;
 }
 
-void Node::setFCost(int _fCost)
+void Node::setFCost(double _fCost)
 {
 	fCost = _fCost;
 }
 
-void Node::setDistanceWithStart(int _distanceWithStart)
+void Node::setDistanceWithStart(double _distanceWithStart)
 {
 	distanceWithStart = _distanceWithStart;
 }
