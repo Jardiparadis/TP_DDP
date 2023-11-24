@@ -246,6 +246,7 @@ void Map::drawSolution(std::shared_ptr<Node> finalNode)
 	}
 }
 
+// Implementation of the A* algorithm to find a path between the two coordinates
 void Map::searchForPath(int startingX, int startingY, int destinationX, int destinationY)
 {
 	// We choose unordered map for fast access to elements, easy insert / delete anywhere in the list, as theya re not contiguous in memory
