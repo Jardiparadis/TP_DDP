@@ -321,19 +321,19 @@ void Map::searchForPath(int startingX, int startingY, int destinationX, int dest
 			double distanceBetweenAdjacenteNodeAndCurrentNode = getDistanceBetweenTwoPoint(adjacentNode.getPoint()->getX(), adjacentNode.getPoint()->getY(), currentNode->getPoint()->getX(), currentNode->getPoint()->getY());
 			double distanceWithStart = currentNode->getDistanceWithStart() + distanceBetweenAdjacenteNodeAndCurrentNode;
 			double fCost = (distanceWithStart + getDistanceBetweenTwoPoint(adjacentNode.getPoint()->getX(), adjacentNode.getPoint()->getY(), destinationX, destinationY)) * fieldModifier;
-			
 			// About currentNode.get() : shared_ptr are stored until the end of the function, so there is no risk of pointer invalidation
 			// We need to work with raw pointer here to avoid circular dependencies, and as the value wan be NULL, we can't use weak_ptr
 			std::shared_ptr<Node> node(new Node(adjacentNode.getPoint(), currentNode.get(), fCost, distanceWithStart));
-			
 			openList.insert({ std::to_string(node->getPoint()->getX()) + ';' + std::to_string(node->getPoint()->getY()) , node });
 
+			// If the costsList is empty, no need to sort it, just insert it
 			if (costsList.begin() == costsList.end())
 			{
 				costsList.push_front(std::make_pair(node->getFCost(), node));
 				continue;
 			}
 
+			// Insert the new cost in the map, sorted from the smallest to the greatest
 			auto indexToInsert = costsList.begin();
 			for (auto it = costsList.begin(); it != costsList.end(); it++) {
 				if (node->getFCost() < it->first)
