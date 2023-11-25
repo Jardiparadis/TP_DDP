@@ -239,7 +239,7 @@ void Map::searchForPath(int startingX, int startingY, int destinationX, int dest
 	std::unordered_map<std::string, std::shared_ptr<Node>> openList;
 	// Close list store explored nodes
 	std::unordered_map<std::string, std::shared_ptr<Node>> closeList;
-	// Key in these map are formated like : "x-coordinate;y-coordinate"
+	// Key in the maps above are formated like : "x-coordinate;y-coordinate"
 
 	// Store cost for each point. Take more memory but a lot faster for retrieving values than iterating on the map
 	// We choose optimization on execution time rather than memory usage
@@ -322,7 +322,7 @@ void Map::searchForPath(int startingX, int startingY, int destinationX, int dest
 			double distanceWithStart = currentNode->getDistanceWithStart() + distanceBetweenAdjacenteNodeAndCurrentNode;
 			double fCost = (distanceWithStart + getDistanceBetweenTwoPoint(adjacentNode.getPoint()->getX(), adjacentNode.getPoint()->getY(), destinationX, destinationY)) * fieldModifier;
 			// About currentNode.get() : shared_ptr are stored until the end of the function, so there is no risk of pointer invalidation
-			// We need to work with raw pointer here to avoid circular dependencies, and as the value wan be NULL, we can't use weak_ptr
+			// We need to work with raw pointer here to avoid circular dependencies, and as the value can be intialized with NULL, we didn't want to use weak_ptr, as we know the pointer won't expire
 			std::shared_ptr<Node> node(new Node(adjacentNode.getPoint(), currentNode.get(), fCost, distanceWithStart));
 			openList.insert({ std::to_string(node->getPoint()->getX()) + ';' + std::to_string(node->getPoint()->getY()) , node });
 

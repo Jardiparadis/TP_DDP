@@ -1,5 +1,18 @@
 #include "node.h"
 
+Node::Node(Point* _point, Node* _parent, double _fCost, double _distanceWithStart)
+{
+	point = _point;
+	parent = _parent;
+	fCost = _fCost;
+	distanceWithStart = _distanceWithStart;
+}
+
+Node::~Node()
+{
+
+}
+
 Node *Node::getParent() const
 {
 	return parent;
@@ -20,22 +33,3 @@ double Node::getDistanceWithStart() const
 	return distanceWithStart;
 }
 
-void Node::setParent(Node *_parent)
-{
-	parent = _parent;
-}
-
-void Node::setPoint(Point* _point)
-{
-	point = _point;
-}
-
-void Node::setFCost(double _fCost)
-{
-	fCost = _fCost;
-}
-
-void Node::setDistanceWithStart(double _distanceWithStart)
-{
-	distanceWithStart = _distanceWithStart;
-}

@@ -5,6 +5,8 @@
 
 #include "map.h"
 
+// DO NOT USE "using name std" AS WE ARE SHADOWING THE NAME MAP !
+
 int main()
 {
 	Map map(0, 0);
@@ -18,27 +20,21 @@ int main()
 	map.createNewPoint(6, 7, FIELD_TYPE::OBSTACLE);
 	map.createNewPoint(6, 5, FIELD_TYPE::REEF);
 
-	//map.displayMap();
-
-	const std::string legend("Map legend: '.' is water, '^' is reef, 'Z' is tempest, 'X' is obstacle, 'S' is the starting point, 'E' is the destination point, '#' is the path to use to connect the staring point and the destination point.");
-	std::cout << legend << std::endl;
-
-	std::cout << "##########" << std::endl;
-
+	std::cout << std::endl << "-------------- LEGEND -------------" << std::endl << std::endl;
+	std::cout << ". -> water" << std::endl << "^ -> reef" << std::endl << "Z -> tempest" << std::endl << "X -> obstacle" << std::endl <<
+		"S -> starting point" << std::endl << "E -> destination point" << std::endl << "# -> path between S and E" << std::endl;
+	
+	std::cout << std::endl << "--------------- MAP ---------------" << std::endl << std::endl;
+	map.displayMap();
+	
+	std::cout << std::endl << "----------- PATHFINDING -----------" << std::endl << std::endl;
 	auto t1 = std::chrono::high_resolution_clock::now();
-
 	map.searchForPath(0, 6, 7, 7);
-
-	std::cout << "OH NO!" << std::endl;
-
 	auto t2 = std::chrono::high_resolution_clock::now();
 
-	std::cout << "##########" << std::endl;
-
+	std::cout << std::endl << "----------- PERFORMANCE -----------" << std::endl << std::endl;
 	std::chrono::duration<double, std::milli> ms_double = t2 - t1;
-	std::cout << ms_double.count() << "ms\n";
-
-	//map.displayMap();
+	std::cout << "It tooks " << ms_double.count() << "ms to find the path." << std::endl;
 
 	return 0;
 }
