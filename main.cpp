@@ -9,7 +9,7 @@ int main()
 {
 	Map map(0, 0);
 
-	map.createNewPoint(200, 200, FIELD_TYPE::WATER);
+	map.createNewPoint(12, 12, FIELD_TYPE::WATER);
 	map.createNewPoint(5, 4, FIELD_TYPE::TEMPEST);
 	map.createNewPoint(6, 6, FIELD_TYPE::REEF);
 	map.createNewPoint(7, 5, FIELD_TYPE::REEF);
@@ -19,6 +19,9 @@ int main()
 	map.createNewPoint(6, 5, FIELD_TYPE::REEF);
 
 	//map.displayMap();
+
+	const std::string legend("Map legend: '.' is water, '^' is reef, 'Z' is tempest, 'X' is obstacle, 'S' is the starting point, 'E' is the destination point, '#' is the path to use to connect the staring point and the destination point.");
+	std::cout << legend << std::endl;
 
 	std::cout << "##########" << std::endl;
 

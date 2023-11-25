@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <string>
 #include <forward_list>
+#include <map>
 
 #include "point.h"
 #include "node.h"
@@ -33,12 +34,16 @@ private:
 	int smallestY;
 	int greatestY;
 	std::deque<std::deque<Point>> board;
+	/*
+	* Map storing FIELD_TYPE as key.
+	* The value is composed of 2 elements: the first one is the character to display for this field type, the second is the speed modifier to apply on the pathfinding algorithm.
+	*/
+	std::map<FIELD_TYPE, std::pair<char, double>> fieldTypeInformations;
 
 	void createNewColumn(COORDINATE_DIRECTION direction);
 	void createNewLine(COORDINATE_DIRECTION direction);
 	Point* getPoint(int x, int y);
 	double getDistanceBetweenTwoPoint(int x1, int y1, int x2, int y2);
-	std::shared_ptr<Node> getLowestFCostIndex(const std::unordered_map<std::string, std::shared_ptr<Node>>& list);
 	void drawSolution(std::shared_ptr<Node> finalNode);
 	bool isInPath(Node *finalNode, const Point& cell) const;
 	Node *getFirstNode(Node *finalNode) const;

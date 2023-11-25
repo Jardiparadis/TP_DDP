@@ -19,39 +19,81 @@ Map::Map(int _xSize, int _ySize)
 	{
 		createNewColumn(COORDINATE_DIRECTION::POSITIVE);
 	}
+
+	//Initialise fieldTypeInformations
+	fieldTypeInformations = {
+		{ FIELD_TYPE::OBSTACLE, std::make_pair<char, double>('X', 0  ) },
+		{ FIELD_TYPE::REEF    , std::make_pair<char, double>('^', 2  ) },
+		{ FIELD_TYPE::TEMPEST , std::make_pair<char, double>('Z', 1.5) },
+		{ FIELD_TYPE::WATER   , std::make_pair<char, double>('.', 1  ) }
+	};
 }
 
 Map::~Map()
 {
 }
 
+// Is the point is in the path found ?
+bool Map::isInPath(Node* finalNode, const Point& cell) const
+{
+	while (finalNode != NULL)
+	{
+		if (finalNode->getPoint()->getX() == cell.getX() && finalNode->getPoint()->getY() == cell.getY())
+		{
+			return true;
+		}
+		finalNode = finalNode->getParent();
+	}
+	return false;
+}
+
+// Display the map and the path found
+void Map::drawSolution(std::shared_ptr<Node> finalNode)
+{
+	Node* firstNode = getFirstNode(finalNode.get());
+	for (const auto& line : board)
+	{
+		for (const auto& cell : line)
+		{
+			// If it is the first node, display it as the end of the path (node path is reversed)
+			if (finalNode->getPoint()->getX() == cell.getX() && finalNode->getPoint()->getY() == cell.getY())
+			{
+				std::cout << "E";
+				continue;
+			}
+
+			// If it is the last node, display it as the start of the path (node path is reversed)
+			if (firstNode->getPoint()->getX() == cell.getX() && firstNode->getPoint()->getY() == cell.getY())
+			{
+				std::cout << "S";
+				continue;
+			}
+
+			if (isInPath(finalNode.get(), cell))
+			{
+				std::cout << "#";
+				continue;
+			}
+			std::cout << fieldTypeInformations[cell.getFieldType()].first;
+		}
+		std::cout << std::endl;
+	}
+}
+
+// Display the map
 void Map::displayMap()
 {
 	for (const auto& line : board)
 	{
 		for (const auto& cell : line)
 		{
-			if (cell.getFieldType() == FIELD_TYPE::OBSTACLE)
-			{
-				std::cout << "X";
-			}
-			else if (cell.getFieldType() == FIELD_TYPE::WATER)
-			{
-				std::cout << ".";
-			}
-			else if (cell.getFieldType() == FIELD_TYPE::REEF)
-			{
-				std::cout << ",";
-			}
-			else if (cell.getFieldType() == FIELD_TYPE::TEMPEST)
-			{
-				std::cout << ";";
-			}
+			std::cout << fieldTypeInformations[cell.getFieldType()].first;
 		}
 		std::cout << std::endl;
 	}
 }
 
+// Add a new column to the map
 void Map::createNewColumn(COORDINATE_DIRECTION direction)
 {
 	int yCoordinate = smallestY;
@@ -75,6 +117,7 @@ void Map::createNewColumn(COORDINATE_DIRECTION direction)
 	}
 }
 
+// Add a new line to the map
 void Map::createNewLine(COORDINATE_DIRECTION direction)
 {
 	std::deque<Point> line;
@@ -101,6 +144,7 @@ void Map::createNewLine(COORDINATE_DIRECTION direction)
 	}
 }
 
+// Get the point from the map at the given coordinates
 Point* Map::getPoint(int x, int y)
 {
 	for (int i = 0; i != board.size(); ++i)
@@ -119,6 +163,7 @@ Point* Map::getPoint(int x, int y)
 	return NULL;
 }
 
+// Create a new point in the map. If it is currenlty oustide the boundaries of the "known" map, expand it until the point can be placed.
 void Map::createNewPoint(int x, int y, FIELD_TYPE fieldType)
 {
 	// If point already exists, only update type
@@ -166,37 +211,13 @@ void Map::createNewPoint(int x, int y, FIELD_TYPE fieldType)
 	getPoint(x, y)->setFieldType(fieldType);
 }
 
-std::shared_ptr<Node> Map::getLowestFCostIndex(const std::unordered_map<std::string, std::shared_ptr<Node>>& list)
-{
-	std::shared_ptr<Node> smallestCost = list.begin()->second;
-
-	for (auto it = list.begin(); it != list.end(); it++) {
-		if (smallestCost->getFCost() > it->second->getFCost())
-		{
-			smallestCost = it->second;
-		}
-	}
-	return smallestCost;
-}
-
+// Get the distance between to point
 double Map::getDistanceBetweenTwoPoint(int x1, int y1, int x2, int y2)
 {
 	return sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2));
 }
 
-bool Map::isInPath(Node *finalNode, const Point &cell) const
-{
-	while (finalNode != NULL)
-	{
-		if (finalNode->getPoint()->getX() == cell.getX() && finalNode->getPoint()->getY() == cell.getY())
-		{
-			return true;
-		}
-		finalNode = finalNode->getParent();
-	}
-	return false;
-}
-
+// Get the first node of the parent chain
 Node *Map::getFirstNode(Node *finalNode) const
 {
 	while (finalNode != NULL)
@@ -210,54 +231,6 @@ Node *Map::getFirstNode(Node *finalNode) const
 	return NULL;
 }
 
-void Map::drawSolution(std::shared_ptr<Node> finalNode)
-{	
-	Node *firstNode = getFirstNode(finalNode.get());
-	for (const auto& line : board)
-	{
-		for (const auto& cell : line)
-		{
-			// If it is the first node, display it as the end of the path (node path is reversed)
-			if (finalNode->getPoint()->getX() == cell.getX() && finalNode->getPoint()->getY() == cell.getY())
-			{
-				std::cout << "E";
-				continue;
-			}
-
-			// If it is the last node, display it as the start of the path (node path is reversed)
-			if (firstNode->getPoint()->getX() == cell.getX() && firstNode->getPoint()->getY() == cell.getY())
-			{
-				std::cout << "S";
-				continue;
-			}
-
-			if (isInPath(finalNode.get(), cell))
-			{
-				std::cout << "#";
-				continue;
-			}
-
-			if (cell.getFieldType() == FIELD_TYPE::OBSTACLE)
-			{
-				std::cout << "X";
-			}
-			else if (cell.getFieldType() == FIELD_TYPE::WATER)
-			{
-				std::cout << ".";
-			}
-			else if (cell.getFieldType() == FIELD_TYPE::REEF)
-			{
-				std::cout << ",";
-			}
-			else if (cell.getFieldType() == FIELD_TYPE::TEMPEST)
-			{
-				std::cout << ";";
-			}
-		}
-		std::cout << std::endl;
-	}
-}
-
 // Implementation of the A* algorithm to find a path between the two coordinates
 void Map::searchForPath(int startingX, int startingY, int destinationX, int destinationY)
 {
@@ -268,7 +241,8 @@ void Map::searchForPath(int startingX, int startingY, int destinationX, int dest
 	std::unordered_map<std::string, std::shared_ptr<Node>> closeList;
 	// Key in these map are formated like : "x-coordinate;y-coordinate"
 
-	// Store cost for each point. Take more memory but faster to get that iterationg on the map
+	// Store cost for each point. Take more memory but a lot faster for retrieving values than iterating on the map
+	// We choose optimization on execution time rather than memory usage
 	std::forward_list<std::pair<double, std::shared_ptr<Node>>> costsList;
 
 	//Add start node to openList
@@ -347,18 +321,10 @@ void Map::searchForPath(int startingX, int startingY, int destinationX, int dest
 			double distanceBetweenAdjacenteNodeAndCurrentNode = getDistanceBetweenTwoPoint(adjacentNode.getPoint()->getX(), adjacentNode.getPoint()->getY(), currentNode->getPoint()->getX(), currentNode->getPoint()->getY());
 			node->setDistanceWithStart(currentNode->getDistanceWithStart() + distanceBetweenAdjacenteNodeAndCurrentNode);
 
-			int fieldModifier = 1;
-			if (adjacentNode.getPoint()->getFieldType() == FIELD_TYPE::TEMPEST)
-			{
-				fieldModifier = 1.5;
-			}
-			if (adjacentNode.getPoint()->getFieldType() == FIELD_TYPE::REEF)
-			{
-				fieldModifier = 2;
-			}
+			int fieldModifier = fieldTypeInformations[adjacentNode.getPoint()->getFieldType()].second;
 
 			node->setFCost((node->getDistanceWithStart() + getDistanceBetweenTwoPoint(adjacentNode.getPoint()->getX(), adjacentNode.getPoint()->getY(), destinationX, destinationY)) * fieldModifier);
-			// Shared_ptr are stored until the end, so there is no risk to lose the pointer
+			// Shared_ptr are stored until the end of the function, so there is no risk of pointer invalidation
 			node->setParent(currentNode.get());
 			openList.insert({ std::to_string(node->getPoint()->getX()) + ';' + std::to_string(node->getPoint()->getY()) , node });
 
