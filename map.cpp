@@ -317,15 +317,15 @@ void Map::searchForPath(int startingX, int startingY, int destinationX, int dest
 			}
 
 			// Create a new node and insert it in the open list
-			std::shared_ptr<Node> node(new Node(adjacentNode.getPoint()));
-			double distanceBetweenAdjacenteNodeAndCurrentNode = getDistanceBetweenTwoPoint(adjacentNode.getPoint()->getX(), adjacentNode.getPoint()->getY(), currentNode->getPoint()->getX(), currentNode->getPoint()->getY());
-			node->setDistanceWithStart(currentNode->getDistanceWithStart() + distanceBetweenAdjacenteNodeAndCurrentNode);
-
 			int fieldModifier = fieldTypeInformations[adjacentNode.getPoint()->getFieldType()].second;
-
-			node->setFCost((node->getDistanceWithStart() + getDistanceBetweenTwoPoint(adjacentNode.getPoint()->getX(), adjacentNode.getPoint()->getY(), destinationX, destinationY)) * fieldModifier);
-			// Shared_ptr are stored until the end of the function, so there is no risk of pointer invalidation
-			node->setParent(currentNode.get());
+			double distanceBetweenAdjacenteNodeAndCurrentNode = getDistanceBetweenTwoPoint(adjacentNode.getPoint()->getX(), adjacentNode.getPoint()->getY(), currentNode->getPoint()->getX(), currentNode->getPoint()->getY());
+			double distanceWithStart = currentNode->getDistanceWithStart() + distanceBetweenAdjacenteNodeAndCurrentNode;
+			double fCost = (distanceWithStart + getDistanceBetweenTwoPoint(adjacentNode.getPoint()->getX(), adjacentNode.getPoint()->getY(), destinationX, destinationY)) * fieldModifier;
+			
+			// About currentNode.get() : shared_ptr are stored until the end of the function, so there is no risk of pointer invalidation
+			// We need to work with raw pointer here to avoid circular dependencies, and as the value wan be NULL, we can't use weak_ptr
+			std::shared_ptr<Node> node(new Node(adjacentNode.getPoint(), currentNode.get(), fCost, distanceWithStart));
+			
 			openList.insert({ std::to_string(node->getPoint()->getX()) + ';' + std::to_string(node->getPoint()->getY()) , node });
 
 			if (costsList.begin() == costsList.end())
