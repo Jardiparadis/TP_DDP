@@ -231,6 +231,19 @@ Node *Map::getFirstNode(Node *finalNode) const
 	return NULL;
 }
 
+// Get element with the lowest fCost
+std::shared_ptr<Node> Map::getLowestFCostIndex(const std::unordered_map<std::string, std::shared_ptr<Node>>& list)
+{
+	std::shared_ptr<Node> smallestCost = list.begin()->second;
+	for (auto it = list.begin(); it != list.end(); it++) {
+		if (smallestCost->getFCost() > it->second->getFCost())
+		{
+			smallestCost = it->second;
+		}
+	}
+	return smallestCost;
+}
+
 // Implementation of the A* algorithm to find a path between the two coordinates
 void Map::searchForPath(int startingX, int startingY, int destinationX, int destinationY)
 {
@@ -241,23 +254,17 @@ void Map::searchForPath(int startingX, int startingY, int destinationX, int dest
 	std::unordered_map<std::string, std::shared_ptr<Node>> closeList;
 	// Key in the maps above are formated like : "x-coordinate;y-coordinate"
 
-	// Store cost for each point. Take more memory but a lot faster for retrieving values than iterating on the map
-	// We choose optimization on execution time rather than memory usage
-	std::forward_list<std::pair<double, std::shared_ptr<Node>>> costsList;
-
 	//Add start node to openList
 	std::shared_ptr<Node> startNode(new Node(getPoint(startingX, startingY)));
 	openList.insert({ std::to_string(startNode->getPoint()->getX()) + ';' + std::to_string(startNode->getPoint()->getY()) , startNode });
-	costsList.push_front(std::make_pair(startNode->getFCost(), startNode));
 
 	while (openList.size() > 0)
 	{
 		// Move lowest cost from open to close list
-		std::shared_ptr<Node> currentNode = costsList.begin()->second;
+		std::shared_ptr<Node> currentNode = getLowestFCostIndex(openList);
 		std::string currentNodeKey = std::to_string(currentNode->getPoint()->getX()) + ';' + std::to_string(currentNode->getPoint()->getY());
 		closeList.insert({ currentNodeKey, currentNode });
 		openList.erase(currentNodeKey);
-		costsList.pop_front();
 
 		// Win condition
 		if (currentNode->getPoint()->getX() == destinationX && currentNode->getPoint()->getY() == destinationY)
@@ -325,24 +332,6 @@ void Map::searchForPath(int startingX, int startingY, int destinationX, int dest
 			// We need to work with raw pointer here to avoid circular dependencies, and as the value can be intialized with NULL, we didn't want to use weak_ptr, as we know the pointer won't expire
 			std::shared_ptr<Node> node(new Node(adjacentNode.getPoint(), currentNode.get(), fCost, distanceWithStart));
 			openList.insert({ std::to_string(node->getPoint()->getX()) + ';' + std::to_string(node->getPoint()->getY()) , node });
-
-			// If the costsList is empty, no need to sort it, just insert it
-			if (costsList.begin() == costsList.end())
-			{
-				costsList.push_front(std::make_pair(node->getFCost(), node));
-				continue;
-			}
-
-			// Insert the new cost in the map, sorted from the smallest to the greatest
-			auto indexToInsert = costsList.begin();
-			for (auto it = costsList.begin(); it != costsList.end(); it++) {
-				if (node->getFCost() < it->first)
-				{
-					costsList.insert_after(indexToInsert, std::make_pair(node->getFCost(), node));
-					break;
-				}
-				indexToInsert++;
-			}
 		}
 	}
 }

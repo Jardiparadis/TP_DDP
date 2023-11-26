@@ -47,4 +47,5 @@ private:
 	void drawSolution(std::shared_ptr<Node> finalNode);
 	bool isInPath(Node *finalNode, const Point& cell) const;
 	Node *getFirstNode(Node *finalNode) const;
+	std::shared_ptr<Node> getLowestFCostIndex(const std::unordered_map<std::string, std::shared_ptr<Node>>& list);
 };
