@@ -244,9 +244,33 @@ std::shared_ptr<Node> Map::getLowestFCostIndex(const std::unordered_map<std::str
 	return smallestCost;
 }
 
+// Is the point given as parameter are in the map ?
+bool Map::isStartAndDestinationPointOnTheMap(int startingX, int startingY, int destinationX, int destinationY) const
+{
+	// check starting coordinate
+	if (startingY > greatestY || startingY < smallestY || startingX > greatestX || startingX < smallestX)
+	{
+		return false;
+	}
+
+	// check destination coordinate
+	if (destinationY > greatestY || destinationY < smallestY || destinationX > greatestX || destinationX < smallestX)
+	{
+		return false;
+	}
+	return true;
+}
+
 // Implementation of the A* algorithm to find a path between the two coordinates
 void Map::searchForPath(int startingX, int startingY, int destinationX, int destinationY)
 {
+	// If starting point or destination point are not in the current map, stop execution
+	if (!isStartAndDestinationPointOnTheMap(startingX, startingY, destinationX, destinationY))
+	{
+		std::cout << "The starting or destination point are out of the map ! The path will not be searched." << std::endl;
+		return;
+	}
+
 	// We choose unordered map for fast access to elements, easy insert / delete anywhere in the list, as theya re not contiguous in memory
 	// Open list store node to inspect
 	std::unordered_map<std::string, std::shared_ptr<Node>> openList;

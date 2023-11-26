@@ -48,4 +48,5 @@ private:
 	bool isInPath(Node *finalNode, const Point& cell) const;
 	Node *getFirstNode(Node *finalNode) const;
 	std::shared_ptr<Node> getLowestFCostIndex(const std::unordered_map<std::string, std::shared_ptr<Node>>& list) const;
+	bool Map::isStartAndDestinationPointOnTheMap(int startingX, int startingY, int destinationX, int destinationY) const;
 };
