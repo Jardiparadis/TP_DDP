@@ -48,7 +48,7 @@ bool Map::isInPath(Node* finalNode, const Point& cell) const
 }
 
 // Display the map and the path found
-void Map::drawSolution(std::shared_ptr<Node> finalNode)
+void Map::drawSolution(std::shared_ptr<Node> finalNode) const
 {
 	Node* firstNode = getFirstNode(finalNode.get());
 	for (const auto& line : board)
@@ -74,20 +74,20 @@ void Map::drawSolution(std::shared_ptr<Node> finalNode)
 				std::cout << "#";
 				continue;
 			}
-			std::cout << fieldTypeInformations[cell.getFieldType()].first;
+			std::cout << fieldTypeInformations.at(cell.getFieldType()).first;
 		}
 		std::cout << std::endl;
 	}
 }
 
 // Display the map
-void Map::displayMap()
+void Map::displayMap() const
 {
 	for (const auto& line : board)
 	{
 		for (const auto& cell : line)
 		{
-			std::cout << fieldTypeInformations[cell.getFieldType()].first;
+			std::cout << fieldTypeInformations.at(cell.getFieldType()).first;
 		}
 		std::cout << std::endl;
 	}
@@ -212,7 +212,7 @@ void Map::createNewPoint(int x, int y, FIELD_TYPE fieldType)
 }
 
 // Get the distance between to point
-double Map::getDistanceBetweenTwoPoint(int x1, int y1, int x2, int y2)
+double Map::getDistanceBetweenTwoPoint(int x1, int y1, int x2, int y2) const
 {
 	return sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2));
 }
@@ -232,7 +232,7 @@ Node *Map::getFirstNode(Node *finalNode) const
 }
 
 // Get element with the lowest fCost
-std::shared_ptr<Node> Map::getLowestFCostIndex(const std::unordered_map<std::string, std::shared_ptr<Node>>& list)
+std::shared_ptr<Node> Map::getLowestFCostIndex(const std::unordered_map<std::string, std::shared_ptr<Node>>& list) const
 {
 	std::shared_ptr<Node> smallestCost = list.begin()->second;
 	for (auto it = list.begin(); it != list.end(); it++) {
@@ -255,14 +255,14 @@ void Map::searchForPath(int startingX, int startingY, int destinationX, int dest
 	// Key in the maps above are formated like : "x-coordinate;y-coordinate"
 
 	//Add start node to openList
-	std::shared_ptr<Node> startNode(new Node(getPoint(startingX, startingY)));
+	const std::shared_ptr<Node> startNode(new Node(getPoint(startingX, startingY)));
 	openList.insert({ std::to_string(startNode->getPoint()->getX()) + ';' + std::to_string(startNode->getPoint()->getY()) , startNode });
 
 	while (openList.size() > 0)
 	{
 		// Move lowest cost from open to close list
-		std::shared_ptr<Node> currentNode = getLowestFCostIndex(openList);
-		std::string currentNodeKey = std::to_string(currentNode->getPoint()->getX()) + ';' + std::to_string(currentNode->getPoint()->getY());
+		const std::shared_ptr<Node> currentNode = getLowestFCostIndex(openList);
+		const std::string currentNodeKey = std::to_string(currentNode->getPoint()->getX()) + ';' + std::to_string(currentNode->getPoint()->getY());
 		closeList.insert({ currentNodeKey, currentNode });
 		openList.erase(currentNodeKey);
 
@@ -284,13 +284,11 @@ void Map::searchForPath(int startingX, int startingY, int destinationX, int dest
 			Node(getPoint(currentNode->getPoint()->getX() - 1, currentNode->getPoint()->getY() + 1))
 		};
 
-		int i = -1;
 		// explore adjacentes nodes
-		for (const auto& adjacentNode : adjacentNodes)
+		for (int i = 0; i != adjacentNodes.size(); ++i)
 		{
-			i += 1;
 			// Node does not exists on the map
-			if (adjacentNode.getPoint() == NULL)
+			if (adjacentNodes[i].getPoint() == NULL)
 			{
 				continue;
 			}
@@ -304,33 +302,33 @@ void Map::searchForPath(int startingX, int startingY, int destinationX, int dest
 			if (i % 2 != 0)
 			{
 				// Loop the vector: in the map, the last element is next to the first
-				int nextNodeIndex = (i + 1) % 8;
-				int previousNodeIndex = i - 1;
+				const int nextNodeIndex = (i + 1) % 8;
+				const int previousNodeIndex = i - 1;
 				if (adjacentNodes[nextNodeIndex].getPoint()->getFieldType() == FIELD_TYPE::OBSTACLE || adjacentNodes[previousNodeIndex].getPoint()->getFieldType() == FIELD_TYPE::OBSTACLE)
 				{
 					continue;
 				}
 			}
 
-			std::string nodeKey = std::to_string(adjacentNode.getPoint()->getX()) + ';' + std::to_string(adjacentNode.getPoint()->getY());
+			const std::string nodeKey = std::to_string(adjacentNodes[i].getPoint()->getX()) + ';' + std::to_string(adjacentNodes[i].getPoint()->getY());
 			const auto &nodeInOpenList = openList.find(nodeKey);
 			if (
-				adjacentNode.getPoint()->getFieldType() == FIELD_TYPE::OBSTACLE || // If it is an obstacle
+				adjacentNodes[i].getPoint()->getFieldType() == FIELD_TYPE::OBSTACLE || // If it is an obstacle
 				closeList.find(nodeKey) != closeList.end() || // If it exists in the close list
-				(nodeInOpenList != openList.end() && nodeInOpenList->second->getFCost() < adjacentNode.getFCost()) //If it exists in the open list with a smaller fCost value
+				(nodeInOpenList != openList.end() && nodeInOpenList->second->getFCost() < adjacentNodes[i].getFCost()) //If it exists in the open list with a smaller fCost value
 			)
 			{
 				continue;
 			}
 
 			// Create a new node and insert it in the open list
-			int fieldModifier = fieldTypeInformations[adjacentNode.getPoint()->getFieldType()].second;
-			double distanceBetweenAdjacenteNodeAndCurrentNode = getDistanceBetweenTwoPoint(adjacentNode.getPoint()->getX(), adjacentNode.getPoint()->getY(), currentNode->getPoint()->getX(), currentNode->getPoint()->getY());
-			double distanceWithStart = currentNode->getDistanceWithStart() + distanceBetweenAdjacenteNodeAndCurrentNode;
-			double fCost = (distanceWithStart + getDistanceBetweenTwoPoint(adjacentNode.getPoint()->getX(), adjacentNode.getPoint()->getY(), destinationX, destinationY)) * fieldModifier;
+			const double fieldModifier = fieldTypeInformations[adjacentNodes[i].getPoint()->getFieldType()].second;
+			const double distanceBetweenAdjacenteNodeAndCurrentNode = getDistanceBetweenTwoPoint(adjacentNodes[i].getPoint()->getX(), adjacentNodes[i].getPoint()->getY(), currentNode->getPoint()->getX(), currentNode->getPoint()->getY());
+			const double distanceWithStart = currentNode->getDistanceWithStart() + distanceBetweenAdjacenteNodeAndCurrentNode;
+			const double fCost = (distanceWithStart + getDistanceBetweenTwoPoint(adjacentNodes[i].getPoint()->getX(), adjacentNodes[i].getPoint()->getY(), destinationX, destinationY)) * fieldModifier;
 			// About currentNode.get() : shared_ptr are stored until the end of the function, so there is no risk of pointer invalidation
 			// We need to work with raw pointer here to avoid circular dependencies, and as the value can be intialized with NULL, we didn't want to use weak_ptr, as we know the pointer won't expire
-			std::shared_ptr<Node> node(new Node(adjacentNode.getPoint(), currentNode.get(), fCost, distanceWithStart));
+			const std::shared_ptr<Node> node = std::make_shared<Node>(Node(adjacentNodes[i].getPoint(), currentNode.get(), fCost, distanceWithStart));
 			openList.insert({ std::to_string(node->getPoint()->getX()) + ';' + std::to_string(node->getPoint()->getY()) , node });
 		}
 	}

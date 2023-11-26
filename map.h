@@ -23,7 +23,7 @@ public:
 	Map(int _xSize, int _ySize);
 	~Map();
 
-	void displayMap();
+	void displayMap() const;
 	void createNewPoint(int x, int y, FIELD_TYPE fieldType);
 	void searchForPath(int startingX, int startingY, int destinationX, int destinationY);
 private:
@@ -43,9 +43,9 @@ private:
 	void createNewColumn(COORDINATE_DIRECTION direction);
 	void createNewLine(COORDINATE_DIRECTION direction);
 	Point* getPoint(int x, int y);
-	double getDistanceBetweenTwoPoint(int x1, int y1, int x2, int y2);
-	void drawSolution(std::shared_ptr<Node> finalNode);
+	double getDistanceBetweenTwoPoint(int x1, int y1, int x2, int y2) const;
+	void drawSolution(std::shared_ptr<Node> finalNode) const;
 	bool isInPath(Node *finalNode, const Point& cell) const;
 	Node *getFirstNode(Node *finalNode) const;
-	std::shared_ptr<Node> getLowestFCostIndex(const std::unordered_map<std::string, std::shared_ptr<Node>>& list);
+	std::shared_ptr<Node> getLowestFCostIndex(const std::unordered_map<std::string, std::shared_ptr<Node>>& list) const;
 };

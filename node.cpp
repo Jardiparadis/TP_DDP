@@ -10,7 +10,6 @@ Node::Node(Point* _point, Node* _parent, double _fCost, double _distanceWithStar
 
 Node::~Node()
 {
-
 }
 
 Node *Node::getParent() const
@@ -32,4 +31,3 @@ double Node::getDistanceWithStart() const
 {
 	return distanceWithStart;
 }
-
