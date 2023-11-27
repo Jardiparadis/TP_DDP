@@ -11,7 +11,7 @@ int main()
 {
 	Map map(0, 0);
 
-	map.createNewPoint(12, 12, FIELD_TYPE::WATER);
+	map.createNewPoint(500, 500, FIELD_TYPE::WATER);
 	map.createNewPoint(5, 4, FIELD_TYPE::TEMPEST);
 	map.createNewPoint(6, 6, FIELD_TYPE::REEF);
 	map.createNewPoint(7, 5, FIELD_TYPE::REEF);
@@ -25,11 +25,11 @@ int main()
 		"S -> starting point" << std::endl << "E -> destination point" << std::endl << "# -> path between S and E" << std::endl;
 	
 	std::cout << std::endl << "--------------- MAP ---------------" << std::endl << std::endl;
-	map.displayMap();
+	//map.displayMap();
 	
 	std::cout << std::endl << "----------- PATHFINDING -----------" << std::endl << std::endl;
 	auto t1 = std::chrono::high_resolution_clock::now();
-	map.searchForPath(0, 6, 7, 7);
+	map.searchForPath(0, 6, 475, 399);
 	auto t2 = std::chrono::high_resolution_clock::now();
 
 	std::cout << std::endl << "----------- PERFORMANCE -----------" << std::endl << std::endl;

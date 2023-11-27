@@ -278,21 +278,26 @@ void Map::searchForPath(int startingX, int startingY, int destinationX, int dest
 	std::unordered_map<std::string, std::shared_ptr<Node>> closeList;
 	// Key in the maps above are formated like : "x-coordinate;y-coordinate"
 
+	std::map<double, std::shared_ptr<Node>> costsList;
+
 	//Add start node to openList
 	const std::shared_ptr<Node> startNode(new Node(getPoint(startingX, startingY)));
 	openList.insert({ std::to_string(startNode->getPoint()->getX()) + ';' + std::to_string(startNode->getPoint()->getY()) , startNode });
+	costsList[0] = startNode;
 
 	while (openList.size() > 0)
 	{
 		// Move lowest cost from open to close list
-		const std::shared_ptr<Node> currentNode = getLowestFCostIndex(openList);
+		const std::shared_ptr<Node> currentNode = costsList.begin()->second;
 		const std::string currentNodeKey = std::to_string(currentNode->getPoint()->getX()) + ';' + std::to_string(currentNode->getPoint()->getY());
 		closeList.insert({ currentNodeKey, currentNode });
 		openList.erase(currentNodeKey);
+		costsList.erase(costsList.begin());
 
 		// Win condition
 		if (currentNode->getPoint()->getX() == destinationX && currentNode->getPoint()->getY() == destinationY)
 		{
+			return;
 			return drawSolution(currentNode);
 		}
 
@@ -351,9 +356,10 @@ void Map::searchForPath(int startingX, int startingY, int destinationX, int dest
 			const double distanceWithStart = currentNode->getDistanceWithStart() + distanceBetweenAdjacenteNodeAndCurrentNode;
 			const double fCost = (distanceWithStart + getDistanceBetweenTwoPoint(adjacentNodes[i].getPoint()->getX(), adjacentNodes[i].getPoint()->getY(), destinationX, destinationY)) * fieldModifier;
 			// About currentNode.get() : shared_ptr are stored until the end of the function, so there is no risk of pointer invalidation
-			// We need to work with raw pointer here to avoid circular dependencies, and as the value can be intialized with NULL, we didn't want to use weak_ptr, as we know the pointer won't expire
+			// We need to work with raw pointer here to avoid shared_ptr circular dependencies, and as the value can be intialized with NULL, we didn't want to use weak_ptr, as we know the pointer won't expire
 			const std::shared_ptr<Node> node = std::make_shared<Node>(Node(adjacentNodes[i].getPoint(), currentNode.get(), fCost, distanceWithStart));
 			openList.insert({ std::to_string(node->getPoint()->getX()) + ';' + std::to_string(node->getPoint()->getY()) , node });
+			costsList[fCost] = node;
 		}
 	}
 }
